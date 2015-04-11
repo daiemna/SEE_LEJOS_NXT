@@ -15,3 +15,7 @@ hs_err_pid*
 #eclipse files
 .classpath
 .project
+
+#lejos nxt
+*.nxd
+*.nxj
