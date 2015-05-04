@@ -6,8 +6,8 @@ import lejos.robotics.navigation.*;
 public class Main {
 
 	public static void main(String[] args) {
-		test_forward(args);
-//		test_turn(args);
+//		test_forward(args);
+		test_turn(args);
 		System.exit(0);
 	}
 	
@@ -52,9 +52,9 @@ public class Main {
 		
 		while (Button.waitForAnyPress() == Button.ID_ENTER) {
 			draw_line(arm_motor);
-			double travelDistiance = 20;
+			double travelDistiance = 50;
 			pilot.setTravelSpeed(10);  // cm per second
-			pilot.travelArc(80, 60);
+			pilot.travelArc(-80, travelDistiance);
 			while(pilot.isMoving())
 				Thread.yield();
 			System.out.println("Press orange\nto start.");
