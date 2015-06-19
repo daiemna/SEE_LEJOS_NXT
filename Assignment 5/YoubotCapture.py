@@ -176,9 +176,6 @@ plt.ylabel('Y-coordinates')
 """
 Extraction of velocities
 """
-
-
-
 theta = sp.Symbol('theta')
 expr = sp.Matrix([[sp.cos(theta), 0], [sp.sin(theta), 0], [0, 1]])
 rot = sp.lambdify(theta, expr, "numpy")
@@ -204,13 +201,114 @@ wld_vel = np.vstack((wld_fwd, wld_left, wld_right))
 
 import scipy.optimize as scop
 
-def func(x, k, omega):
-    return k*x + omega
+def func(x, k, b):
+    return k*x + b
 
 params, pcov = scop.curve_fit(func, cmd_all[:,0], wld_vel[:,0])
-params_omega, pcov_omega = scop.curve_fit(func, cmd_all[:,1], wld_vel[:,1])
+params_w, pcov_w = scop.curve_fit(func, cmd_all[:,1], wld_vel[:,1])
 
+print 'K_v and b_v ', params
+print 'K_w and b_w ', params_w
 
+"""
+k_v = 3.7603808
+b_v = -18.58159586
+
+k_omega = 0.50574324
+b_omega = -0.00545543
+"""
+
+v_eff = params[0] * cmd_all[:,0] + params[1]
+w_eff = params_w[0] * cmd_all[:,1] + params_w[1]
+
+import scipy.spatial.distance as sp_dist
+
+def opt_alpha(alpha):
+    e1 = alpha[0]*v_eff + alpha[1]*w_eff
+    e2 = alpha[2]*v_eff + alpha[3]*w_eff
+    
+    v = v_eff + np.random.normal(e1)
+    w = w_eff + np.random.normal(e2)
+    
+    all_v = np.vstack((v, w))
+    
+    cov_mat = np.cov(wld_vel.T)
+    
+    total_dist = 0.0
+    for i in xrange(0, len(all_v.T)):
+        total_dist += sp_dist.mahalanobis(all_v.T[i], wld_vel[i], np.linalg.inv(cov_mat))
+    
+    return total_dist
+    
+#opt_alpha(np.array([1.0, 0.0, 1.0, 0.0]))
+
+outputs = scop.fmin(opt_alpha, np.array([3.0, 0.9, 1.0, -0.05]), maxiter=100, full_output=1, retall=1)
+
+alphas = outputs[0]
+min_dist = outputs[1]
+
+soln_iter = None
+
+for i in xrange(0, len(outputs[5])):
+    if soln_iter is None:
+        soln_iter = outputs[5][i]
+    else:
+        soln_iter = np.vstack((soln_iter, outputs[5][i]))
+
+plt.figure()
+plt.plot(soln_iter[:,0], label='Alpha 1')
+plt.plot(soln_iter[:,1], label='Alpha 2')
+plt.plot(soln_iter[:,2], label='Alpha 3')
+plt.plot(soln_iter[:,3], label='Alpha 4')
+plt.legend()
+
+print min_dist
+
+"""
+def sample(x):
+    s = 0.0
+    for i in xrange(12):
+        s += random.uniform(-x, x)
+    return s / 2.0
+
+def optimize_alpha(alpha):
+    sys_params = np.array([ 1.01632284,  1.02608252,  1.02186112 ,-0.03600934])
+    all_total_dist = 0.0
+    for idx, m in enumerate(w_l):
+        v_l = w_l[idx] * math.pi * diam / 360.0 # linear velocity of wheels
+        v_r = w_r[idx] * math.pi * diam / 360.0
+        trans_v = (v_l + v_r) / 2.0
+        angular_w = (v_r - v_l) / base # angular velocity of robot
+        v_eff = sys_params[0] * trans_v + sys_params[1]
+        w_eff = sys_params[2] * angular_w + sys_params[3]
+        
+        sampled_pos = None
+        for i in xrange(20):
+            e1 = alpha[0]*abs(v_eff) + alpha[1]*abs(w_eff)
+            e2 = alpha[2]*abs(v_eff) + alpha[3]*abs(w_eff)
+            v = v_eff + sample(e1)
+            w = w_eff + sample(e2)
+            final = get_predicted_position(np.array([v, w])[:,np.newaxis].T, 1.0, 0.0, 1.0, 0.0)
+            if sampled_pos is not None:
+                sampled_pos = np.vstack((sampled_pos, final))
+            else:
+                sampled_pos = final
+        end_pos = get_end_position(names[idx])
+        cov_mat = np.cov(end_pos[:,0:2].T)
+        mean = np.mean(end_pos[:,0:2], axis=0)
+        total_dist = 0.0
+        for sp in sampled_pos:
+            total_dist += mahalanobis(sp, mean, np.linalg.inv(cov_mat))
+        all_total_dist += total_dist
+    print all_total_dist
+    return all_total_dist
+def main():
+    vel, actual = ideal_velocity()
+    sys_params = velocity_with_systematic_error_correction(vel, actual)
+    #optimize_alpha(np.array([1.0, 1.0, 1.0, 1.0]), sys_params)
+    alphas = fmin(optimize_alpha, np.array([0.01, 0.01, 0.01, 0.01]))
+    print alphas
+"""
 #avg_measured = np.mean(processed, axis=2) #(150, 7)
 
 #from sklearn import linear_model
