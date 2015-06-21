@@ -1,0 +1,55 @@
+Forward:
+Average per timestep :  66.74049217
+Number of timesteps :  150
+Total time for trajectory :  10011.0738255 ms
+Left:
+Average per timestep :  67.2770290506
+Number of timesteps :  160
+Total time for trajectory :  10764.3246481 ms
+Right:
+Average per timestep :  66.763125
+Number of timesteps :  161
+Total time for trajectory :  10748.863125 ms
+
+Velocities
+forward : 
+- Linear: 6.67mm/timestep
+- Angular : 0
+
+forward (in metric term):
+- Linear : 0.0999 mm / ms
+- Angular : Angular : 0 
+
+left : 
+- Linear : 6.25mm/timestep
+- Angular : 0.0078 rad /timestep
+
+left (in metric term):
+- Linear : 0.0929 mm / ms
+- Angular : Angular : 0.00012 rad / ms
+
+right: 
+- Linear : 6.21mm/timestep
+- Angular : 0.0078 rad / timestep
+
+right (in metric term):
+- Linear : 0.093 mm / ms
+- Angular : Angular : 0.00012 rad / ms
+
+Starting poses
+- forward
+	- X-coord : -448.37492
+	- Y-coord : 200.36568
+	- Yaw : 0.59999
+
+- Left
+	- X-coord : -448.74010
+	- Y-coord : 199.93731
+	- Yaw : 0.58412
+	
+- Right
+	- X-coord : -443.57052
+	- Y-coord : 199.53851
+	- Yaw : 0.63805
+	
+	
