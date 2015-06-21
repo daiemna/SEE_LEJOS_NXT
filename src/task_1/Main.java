@@ -21,7 +21,7 @@ public class Main {
 		boolean forward = true;
 		while (Button.waitForAnyPress() == Button.ID_ENTER) {
 			draw_line(arm_motor);
-			double travelDistiance = 60;
+			double travelDistiance = 100;
 			pilot.setTravelSpeed(10);  // cm per second
 //			if(forward){
 				pilot.travel(travelDistiance);         // cm
@@ -52,9 +52,9 @@ public class Main {
 		
 		while (Button.waitForAnyPress() == Button.ID_ENTER) {
 			draw_line(arm_motor);
-			double travelDistiance = 50;
+			double travelDistiance = 100;
 			pilot.setTravelSpeed(10);  // cm per second
-			pilot.travelArc(-80, travelDistiance);
+			pilot.travelArc(80, travelDistiance);
 			while(pilot.isMoving())
 				Thread.yield();
 			System.out.println("Press orange\nto start.");
